@@ -4,19 +4,20 @@ DataModel::DataModel(LineEditDelegate* lineEdit, int columns, QObject* parent)
     : QAbstractTableModel(parent)
     , m_lineEditDelegate(lineEdit)
     , m_columns(columns)
-    , m_rows(255)
 
 {
     for (int j = 0; j < m_columns; j++) {
-        QVector<int> temp(m_rows);
+        QVector<int> temp(1);
         temp.fill(-1);
         m_data.append(temp);
     }
+
+    connect(this, &QAbstractItemModel::dataChanged, this, &DataModel::sltDataChanged);
 }
 
 int DataModel::rowCount(const QModelIndex& parent) const
 {
-    return m_rows;
+    return m_data[0].count();
 }
 
 int DataModel::columnCount(const QModelIndex& parent) const
@@ -43,9 +44,16 @@ QVariant DataModel::data(const QModelIndex& index, int role) const
     if (!index.isValid() || role != Qt::DisplayRole) {
         return QVariant();
     }
-    if (m_data.at(index.column()).at(index.row()) == -1)
+
+    if (m_data.count() <= index.column())
         return QVariant();
-    else {
+
+    if (m_data[index.column()].count() <= index.row())
+        return QVariant();
+
+    if (m_data.at(index.column()).at(index.row()) == -1) {
+        return QVariant();
+    } else {
         if (m_lineEditDelegate == Q_NULLPTR) {
             return m_data.at(index.column()).at(index.row());
         }
@@ -63,8 +71,25 @@ QVariant DataModel::data(const QModelIndex& index, int role) const
 
 Qt::ItemFlags DataModel::flags(const QModelIndex& index) const
 {
+
     if (!index.isValid())
         return Qt::NoItemFlags;
 
+    if (index.row() >=1 && m_data[index.column()][index.row() - 1] == -1)
+        return Qt::NoItemFlags;
+
     return Qt::ItemIsEditable | QAbstractItemModel::flags(index);
+}
+
+void DataModel::sltDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
+{
+    if (topLeft.row() + 1 == m_data[0].count()) {
+        beginInsertRows(QModelIndex(), rowCount(), rowCount());
+        for (int j = 0; j < m_columns; j++) {
+            QVector<int> temp(1);
+            temp.fill(-1);
+            m_data[j].append(temp);
+        }
+        endInsertRows();
+    }
 }

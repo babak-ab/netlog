@@ -19,9 +19,11 @@ public:
     QVariant data(const QModelIndex& index, int role) const;
     Qt::ItemFlags flags(const QModelIndex& index) const;
 
+private Q_SLOTS:
+    void sltDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
+
 private:
     int m_columns;
-    int m_rows;
     QVector<QVector<int>> m_data;
     LineEditDelegate* m_lineEditDelegate;
 };

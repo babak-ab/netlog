@@ -75,10 +75,21 @@ Qt::ItemFlags DataModel::flags(const QModelIndex& index) const
     if (!index.isValid())
         return Qt::NoItemFlags;
 
-    if (index.row() >=1 && m_data[index.column()][index.row() - 1] == -1)
+    if (index.row() >= 1 && m_data[index.column()][index.row() - 1] == -1)
         return Qt::NoItemFlags;
 
     return Qt::ItemIsEditable | QAbstractItemModel::flags(index);
+}
+
+QByteArray DataModel::getData(int column)
+{
+    QByteArray buffer;
+    for (int i = 0; i < m_data[column].size(); ++i) {
+        if (m_data[column].at(i) == -1)
+            break;
+        buffer.append(m_data[column].at(i));
+    }
+    return buffer;
 }
 
 void DataModel::sltDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
@@ -92,4 +103,20 @@ void DataModel::sltDataChanged(const QModelIndex& topLeft, const QModelIndex& bo
         }
         endInsertRows();
     }
+}
+
+QVariant DataModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    //    if (Qt::Horizontal != orientation)
+    //        return QAbstractTableModel::headerData(section, orientation, role);
+
+    //    switch (role) {
+    //    case Qt::DecorationRole: {
+    //        QPixmap p { 12, 12 };
+    //        p.fill(Qt::CheckState(headerData(section, orientation, Qt::CheckStateRole).toUInt()) ? Qt::green : Qt::red);
+    //        return p;
+    //    }
+    //    }
+
+    return QAbstractTableModel::headerData(section, orientation, role);
 }

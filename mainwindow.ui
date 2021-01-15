@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout" rowstretch="0,0" columnstretch="0,2,3">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0" columnstretch="0,2,3">
     <property name="leftMargin">
      <number>2</number>
     </property>
@@ -30,14 +30,17 @@
     <property name="spacing">
      <number>2</number>
     </property>
-    <item row="1" column="2">
-     <widget class="QPlainTextEdit" name="plainTextEdit_2"/>
-    </item>
     <item row="0" column="2">
-     <widget class="QPlainTextEdit" name="plainTextEdit"/>
+     <widget class="QPlainTextEdit" name="plainTextEdit_receive"/>
     </item>
-    <item row="0" column="0" rowspan="2">
+    <item row="0" column="0" rowspan="5">
      <widget class="QToolBox" name="toolBox">
+      <property name="minimumSize">
+       <size>
+        <width>120</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="styleSheet">
        <string notr="true">QToolBox::tab {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
@@ -60,7 +63,7 @@ QToolBox::tab:selected { /* italicize selected tabs */
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>119</width>
+         <width>120</width>
          <height>496</height>
         </rect>
        </property>
@@ -123,7 +126,7 @@ QToolBox::tab:selected { /* italicize selected tabs */
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>68</width>
+         <width>120</width>
          <height>496</height>
         </rect>
        </property>
@@ -133,7 +136,45 @@ QToolBox::tab:selected { /* italicize selected tabs */
       </widget>
      </widget>
     </item>
-    <item row="0" column="1" rowspan="2">
+    <item row="1" column="2" rowspan="4">
+     <widget class="QPlainTextEdit" name="plainTextEdit_send"/>
+    </item>
+    <item row="4" column="1">
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="1" column="1">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Interval(ms):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QSpinBox" name="spinBox_interval">
+        <property name="maximum">
+         <number>10000000</number>
+        </property>
+        <property name="value">
+         <number>100</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="checkBox_interval">
+        <property name="text">
+         <string>Loop</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="3">
+       <widget class="QPushButton" name="pushButton_send">
+        <property name="text">
+         <string>Send</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="0" column="1" rowspan="4">
      <widget class="QTableView" name="tableView_send"/>
     </item>
    </layout>

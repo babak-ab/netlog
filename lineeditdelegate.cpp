@@ -12,7 +12,9 @@ QWidget* LineEditDelegate::createEditor(QWidget* parent, const QStyleOptionViewI
     QLineEdit* editor = new QLineEdit(parent);
 
     if (m_hexEnabled) {
-        editor->setInputMask(">HH");
+        QRegExp re("[0-9a-fA-F]{1,2}");
+        QRegExpValidator* validator = new QRegExpValidator(re);
+        editor->setValidator(validator);
     } else {
         QRegExp re("[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]");
         //QRegExp re("0[xX][0-9a-fA-F]{1,2}");

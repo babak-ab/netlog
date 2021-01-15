@@ -19,12 +19,14 @@ SOURCES += \
     datamodel.cpp \
     lineeditdelegate.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    sendplaintextedit.cpp
 
 HEADERS += \
     datamodel.h \
     lineeditdelegate.h \
-    mainwindow.h
+    mainwindow.h \
+    sendplaintextedit.h
 
 FORMS += \
     mainwindow.ui

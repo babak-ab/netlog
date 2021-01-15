@@ -38,8 +38,17 @@ MainWindow::MainWindow(QWidget* parent)
     m_columnsState.insert(4, false);
     m_columnsState.insert(5, false);
 
+    ui->frame_send->setEnabled(false);
+
     connect(m_customHeader, &CustomHeader::sigStateChecked, [this](int column, bool checked) {
         m_columnsState[column] = checked;
+        bool enable = false;
+        for (int i = 0; i < m_columnsState.count(); i++) {
+            if (m_columnsState[i]) {
+                enable |= m_columnsState[i];
+            }
+            ui->frame_send->setEnabled(enable);
+        }
     });
 
     ui->plainTextEdit_receive->setReadOnly(true);
@@ -131,6 +140,7 @@ void MainWindow::sendData()
             str.clear();
         }
     }
+    ui->plainTextEdit_send->moveCursor(QTextCursor::End);
 }
 
 void MainWindow::on_pushButton_send_clicked()
@@ -143,8 +153,18 @@ void MainWindow::on_checkBox_interval_stateChanged(int arg1)
     if (ui->checkBox_interval->isChecked()) {
         m_sendTimer.setInterval(ui->spinBox_interval->value());
         m_sendTimer.start();
-    }else{
+    } else {
         m_sendTimer.stop();
     }
     ui->pushButton_send->setEnabled(!ui->checkBox_interval->isChecked());
+}
+
+void MainWindow::on_spinBox_interval_valueChanged(int arg1)
+{
+    m_sendTimer.setInterval(ui->spinBox_interval->value());
+}
+
+void MainWindow::on_pushButton_sendClear_clicked()
+{
+    ui->plainTextEdit_send->clear();
 }

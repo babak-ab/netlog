@@ -9,7 +9,9 @@
 #include <QGridLayout>
 #include <QHeaderView>
 #include <QMainWindow>
+#include <QMenu>
 #include <QPainter>
+#include <QPlainTextEdit>
 #include <QPointer>
 #include <QTableView>
 #include <QTimer>
@@ -157,6 +159,10 @@ private Q_SLOTS:
     void on_pushButton_send_clicked();
 
     void on_checkBox_interval_stateChanged(int arg1);
+
+    void on_spinBox_interval_valueChanged(int arg1);
+
+    void on_pushButton_sendClear_clicked();
 
 protected:
     void resizeEvent(QResizeEvent* event);

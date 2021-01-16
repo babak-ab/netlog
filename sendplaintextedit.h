@@ -92,10 +92,25 @@ protected:
 
         QAction* dec = subMenuType->addAction("to Dec");
         dec->setData(Setting::InputType_Dec);
+        dec->setCheckable(true);
+        dec->setChecked(Setting::instance()->sendType() == Setting::InputType_Dec);
+
         QAction* hex = subMenuType->addAction("to Hex");
         hex->setData(Setting::InputType_Hex);
+        hex->setCheckable(true);
+        hex->setChecked(Setting::instance()->sendType() == Setting::InputType_Hex);
+
         QAction* ascii = subMenuType->addAction("to Ascii");
         ascii->setData(Setting::InputType_ASCII);
+        ascii->setCheckable(true);
+        ascii->setChecked(Setting::instance()->sendType() == Setting::InputType_ASCII);
+
+
+        QActionGroup* actionGroup = new QActionGroup(this);
+        actionGroup->addAction(dec);
+        actionGroup->addAction(hex);
+        actionGroup->addAction(ascii);
+        actionGroup->setExclusive(true);
 
         connect(subMenuType, &QMenu::triggered, [subMenuType](QAction* action) {
             Setting::instance()->setSendType((Setting::InputType)action->data().toInt());

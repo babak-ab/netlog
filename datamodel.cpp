@@ -1,8 +1,7 @@
 #include "datamodel.h"
 
-DataModel::DataModel(LineEditDelegate* lineEdit, int columns, QObject* parent)
+DataModel::DataModel(int columns, QObject* parent)
     : QAbstractTableModel(parent)
-    , m_lineEditDelegate(lineEdit)
     , m_columns(columns)
 
 {
@@ -31,16 +30,31 @@ bool DataModel::setData(const QModelIndex& index, const QVariant& value, int rol
         return false;
 
     bool ok = false;
-    m_data[index.column()][index.row()] = value.toString().toInt(&ok, 16);
-    if (ok == false) {
-        return false;
+
+    if (Setting::instance()->inputType() == Setting::InputType_Hex) {
+        m_data[index.column()][index.row()] = value.toString().toInt(&ok, 16);
+        if (ok == false) {
+            return false;
+        }
+    } else if (Setting::instance()->inputType() == Setting::InputType_Dec) {
+        m_data[index.column()][index.row()] = value.toString().toInt(&ok, 10);
+        if (ok == false) {
+            return false;
+        }
+    } else {
+        m_data[index.column()][index.row()] = (int)value.toString().toLatin1()[0];
     }
+
     emit dataChanged(index, index, { Qt::DisplayRole, Qt::EditRole });
     return true;
 }
 
 QVariant DataModel::data(const QModelIndex& index, int role) const
 {
+    if (index.isValid() && role == Qt::TextAlignmentRole) {
+        return Qt::AlignCenter;
+    }
+
     if (!index.isValid() || role != Qt::DisplayRole) {
         return QVariant();
     }
@@ -54,18 +68,15 @@ QVariant DataModel::data(const QModelIndex& index, int role) const
     if (m_data.at(index.column()).at(index.row()) == -1) {
         return QVariant();
     } else {
-        if (m_lineEditDelegate == Q_NULLPTR) {
-            return m_data.at(index.column()).at(index.row());
-        }
-        if (m_lineEditDelegate->hexEnabled()) {
+        if (Setting::instance()->inputType() == Setting::InputType_Hex) {
             int value = m_data.at(index.column()).at(index.row());
-            if (m_lineEditDelegate->addHexPrefix()) {
-                return "0x" + QString::number(value, 16).toUpper();
-            } else {
-                return QString::number(value, 16).toUpper();
-            }
+            return "0x" + QString::number(value, 16).toUpper();
+        } else if (Setting::instance()->inputType() == Setting::InputType_Dec) {
+            return m_data.at(index.column()).at(index.row());
+        } else {
+            int value = m_data.at(index.column()).at(index.row());
+            return QString("/" + QString(QChar(value)));
         }
-        return m_data.at(index.column()).at(index.row());
     }
 }
 
@@ -107,16 +118,5 @@ void DataModel::sltDataChanged(const QModelIndex& topLeft, const QModelIndex& bo
 
 QVariant DataModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    //    if (Qt::Horizontal != orientation)
-    //        return QAbstractTableModel::headerData(section, orientation, role);
-
-    //    switch (role) {
-    //    case Qt::DecorationRole: {
-    //        QPixmap p { 12, 12 };
-    //        p.fill(Qt::CheckState(headerData(section, orientation, Qt::CheckStateRole).toUInt()) ? Qt::green : Qt::red);
-    //        return p;
-    //    }
-    //    }
-
     return QAbstractTableModel::headerData(section, orientation, role);
 }

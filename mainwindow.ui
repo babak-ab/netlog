@@ -140,7 +140,7 @@ QToolBox::tab:selected { /* italicize selected tabs */
      </widget>
     </item>
     <item row="0" column="1" rowspan="4">
-     <widget class="QTableView" name="tableView_send"/>
+     <widget class="CustomTableView" name="tableView_send"/>
     </item>
     <item row="6" column="2">
      <layout class="QHBoxLayout" name="horizontalLayout"/>
@@ -200,21 +200,6 @@ QToolBox::tab:selected { /* italicize selected tabs */
      <height>20</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuInput">
-    <property name="title">
-     <string>Input</string>
-    </property>
-    <widget class="QMenu" name="menuType">
-     <property name="title">
-      <string>Type</string>
-     </property>
-     <addaction name="actionHex"/>
-     <addaction name="actionDecimal"/>
-    </widget>
-    <addaction name="menuType"/>
-    <addaction name="actionAddHexPrefix"/>
-   </widget>
-   <addaction name="menuInput"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionHex">
@@ -253,6 +238,11 @@ QToolBox::tab:selected { /* italicize selected tabs */
    <class>SendPlainTextEdit</class>
    <extends>QPlainTextEdit</extends>
    <header>sendplaintextedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomTableView</class>
+   <extends>QTableView</extends>
+   <header>customtableview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

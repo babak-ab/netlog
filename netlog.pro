@@ -16,17 +16,21 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    customtableview.cpp \
     datamodel.cpp \
     lineeditdelegate.cpp \
     main.cpp \
     mainwindow.cpp \
-    sendplaintextedit.cpp
+    sendplaintextedit.cpp \
+    setting.cpp
 
 HEADERS += \
+    customtableview.h \
     datamodel.h \
     lineeditdelegate.h \
     mainwindow.h \
-    sendplaintextedit.h
+    sendplaintextedit.h \
+    setting.h
 
 FORMS += \
     mainwindow.ui

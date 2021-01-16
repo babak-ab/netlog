@@ -1,15 +1,14 @@
 #ifndef DATAMODEL_H
 #define DATAMODEL_H
 
-#include "lineeditdelegate.h"
-
+#include "setting.h"
 #include <QAbstractItemModel>
 #include <QDebug>
 
 class DataModel : public QAbstractTableModel {
     Q_OBJECT
 public:
-    explicit DataModel(LineEditDelegate* lineEdit, int columns = 6, QObject* parent = Q_NULLPTR);
+    explicit DataModel(int columns = 6, QObject* parent = Q_NULLPTR);
 
     // QAbstractItemModel interface
 public:
@@ -26,7 +25,6 @@ private Q_SLOTS:
 private:
     int m_columns;
     QVector<QVector<int>> m_data;
-    LineEditDelegate* m_lineEditDelegate;
 
     // QAbstractItemModel interface
 public:

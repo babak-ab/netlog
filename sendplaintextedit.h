@@ -32,10 +32,6 @@ protected:
         QAction* toBin = subMenu->addAction("to Bin");
         toBin->setData(2);
 
-        //        QAction* toDecAction = subMenu->addMenu(toDec);
-        //        QAction* toHexAction = subMenu->addMenu(toHex);
-        //        QAction* toBinAction = subMenu->addMenu(toBin);
-
         QString currentText = this->textCursor().selectedText().trimmed();
         connect(subMenu, &QMenu::hovered, [subMenu, currentText](QAction* action) {
             QStringList list = currentText.split(' ');
@@ -49,8 +45,7 @@ protected:
                     str += QString::number(list[i].toUInt(&ok, 16), 16).toUpper().rightJustified(2, '0');
                 }
                 if (action->data() == 2) {
-                    str += QString::number(list[i].toUInt(&ok, 16), 2).toUpper().rightJustified(8, '0');
-                    ;
+                    str += QString::number(list[i].toUInt(&ok, 16), 2).toUpper().rightJustified(8, '0');                    
                 }
 
                 str += " ";
@@ -64,7 +59,6 @@ protected:
                 str);
         });
 
-        //...
         menu->exec(event->globalPos());
         delete menu;
     }

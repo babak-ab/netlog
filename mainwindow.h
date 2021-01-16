@@ -151,10 +151,6 @@ private:
     bool m_colorChange = false;
     bool m_ctrlKeyPressed = false;
 private Q_SLOTS:
-    void sltActionGroupInputTypesTriggered(QAction* action);
-
-    // QWidget interface
-    void on_actionAddHexPrefix_triggered();
 
     void on_pushButton_send_clicked();
 

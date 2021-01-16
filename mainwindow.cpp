@@ -7,14 +7,8 @@ MainWindow::MainWindow(QWidget* parent)
 {
     ui->setupUi(this);
 
-    m_actionGroupInputTypes = new QActionGroup(this);
-    m_actionGroupInputTypes->addAction(ui->actionHex);
-    m_actionGroupInputTypes->addAction(ui->actionDecimal);
-    m_actionGroupInputTypes->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
-    connect(m_actionGroupInputTypes, &QActionGroup::triggered, this, &MainWindow::sltActionGroupInputTypesTriggered);
-
     m_lineEditDelegate = new LineEditDelegate;
-    m_dataModel = new DataModel(m_lineEditDelegate);
+    m_dataModel = new DataModel();
 
     ui->tableView_send->resizeRowsToContents();
 
@@ -66,17 +60,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::sltActionGroupInputTypesTriggered(QAction* action)
-{
-    Q_UNUSED(action)
-    if (ui->actionHex->isChecked()) {
-        m_lineEditDelegate->setHexEnabled(true);
-    }
-    if (ui->actionDecimal->isChecked()) {
-        m_lineEditDelegate->setHexEnabled(false);
-    }
-}
-
 void MainWindow::resizeEvent(QResizeEvent* event)
 {
 
@@ -112,11 +95,6 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
         // standard event processing
         return QObject::eventFilter(watched, event);
     }
-}
-
-void MainWindow::on_actionAddHexPrefix_triggered()
-{
-    m_lineEditDelegate->setAddHexPrefix(ui->actionAddHexPrefix->isChecked());
 }
 
 void MainWindow::sendData()

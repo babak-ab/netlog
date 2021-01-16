@@ -20,9 +20,13 @@ public:
     InputType inputType() const;
     void setInputType(InputType inputType);
 
+    InputType sendType() const;
+    void setSendType(const InputType& sendType);
+
 private:
     bool m_hasOxPrefix = false;
     InputType m_inputType = InputType_Hex;
+    InputType m_sendType = InputType_Hex;
 
     static Setting* m_instance;
 

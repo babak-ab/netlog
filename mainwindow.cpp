@@ -105,7 +105,17 @@ void MainWindow::sendData()
             QString str;
 
             for (int j = 0; j < ba.size(); j++) {
-                str.append(QString::number((quint8)ba[j], 16).rightJustified(2, '0').toUpper());
+
+                if (Setting::instance()->sendType() == Setting::InputType_Dec) {
+                    str.append(QString::number((quint8)ba[j], 10).rightJustified(2, '0').toUpper());
+                }
+                if (Setting::instance()->sendType() == Setting::InputType_Hex) {
+                    str.append(QString::number((quint8)ba[j], 16).rightJustified(2, '0').toUpper());
+                }
+                if (Setting::instance()->sendType() == Setting::InputType_ASCII) {
+                    str.append(QString((char)ba[j]));
+                }
+
                 str.append(" ");
             }
             if (m_colorChange) {

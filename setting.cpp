@@ -23,3 +23,14 @@ void Setting::setInputType(InputType inputType)
     m_inputType = inputType;
     Q_EMIT valueChanged();
 }
+
+Setting::InputType Setting::sendType() const
+{
+    return m_sendType;
+}
+
+void Setting::setSendType(const InputType &sendType)
+{
+    m_sendType = sendType;
+    Q_EMIT valueChanged();
+}

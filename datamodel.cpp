@@ -96,8 +96,11 @@ QByteArray DataModel::getData(int column)
 {
     QByteArray buffer;
     for (int i = 0; i < m_data[column].size(); ++i) {
+
         if (m_data[column].at(i) == -1)
             break;
+
+        //qDebug() << m_data[column].at(i) << QString(m_data[column].at(i)).toLatin1() << QString::number(m_data[column].at(i), 16);
         buffer.append(m_data[column].at(i));
     }
     return buffer;

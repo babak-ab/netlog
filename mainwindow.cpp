@@ -20,6 +20,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     ui->tableView_send->setModel(m_dataModel);
     ui->tableView_send->setItemDelegate(m_lineEditDelegate);
+    ui->tableView_send->setEditTriggers(QAbstractItemView::AllEditTriggers);
 
     //ui->tableView_send->setHorizontalHeader(new CustomHeader(ui->tableView_send));
     // MyHeader *myHeader = new MyHeader(Qt::Horizontal, ui->tableView_send);
@@ -52,6 +53,19 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(&m_sendTimer, &QTimer::timeout, [this]() {
         sendData();
+    });
+
+    //    connect(m_dataModel, &DataModel::rowsInserted, [this]() {
+    //        QModelIndex index = ui->tableView_send->currentIndex();
+    //        ui->tableView_send->setCurrentIndex(m_dataModel->index(index.row() + 1,index.column()));
+    //    });
+    connect(m_dataModel, &DataModel::dataChanged, [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles = QVector<int>()) {
+        QModelIndex index = topLeft;
+        if (m_dataModel->data(index, Qt::DisplayRole).isValid()) {
+            ui->tableView_send->setCurrentIndex(m_dataModel->index(index.row() + 1, index.column()));
+        } else {
+            ui->tableView_send->setCurrentIndex(m_dataModel->index(index.row() - 1, index.column()));
+        }
     });
 }
 

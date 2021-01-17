@@ -29,12 +29,19 @@ bool DataModel::setData(const QModelIndex& index, const QVariant& value, int rol
     if (role != Qt::EditRole)
         return false;
 
-    if (value == -1 && m_data[index.column()][index.row() + 1] != -1) {
+    if (!index.isValid()) {
         return false;
+    }
+
+    if (value == -1 && (index.row() + 1) < rowCount()) {
+        if (m_data[index.column()][index.row() + 1] != -1) {
+            return false;
+        }
     }
 
     bool ok = false;
 
+    qDebug() << "p";
     if (Setting::instance()->inputType() == Setting::InputType_Hex) {
         m_data[index.column()][index.row()] = value.toString().toInt(&ok, 16);
         if (ok == false) {
@@ -49,6 +56,7 @@ bool DataModel::setData(const QModelIndex& index, const QVariant& value, int rol
         m_data[index.column()][index.row()] = (int)value.toString().toLatin1()[0];
     }
 
+    qDebug() << "e" << index;
     emit dataChanged(index, index, { Qt::DisplayRole, Qt::EditRole });
     return true;
 }

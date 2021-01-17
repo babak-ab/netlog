@@ -54,9 +54,35 @@ protected:
 protected:
     void keyPressEvent(QKeyEvent* event)
     {
-
-        if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace) {
+        switch (event->key()) {
+        case Qt::Key_Delete:
+        case Qt::Key_Backspace:
             model()->setData(currentIndex(), -1);
+            break;
+//        case Qt::Key_Return: {
+//            qDebug() << "A" <<  currentIndex();
+//            // we captured the Enter key press, now we need to move to the next row
+//            qint32 nNextRow = currentIndex().row() + 1;
+////            if (nNextRow + 1 > model()->rowCount(currentIndex())) {
+////                // we are all the way down, we can't go any further
+////                nNextRow = nNextRow - 1;
+////            }
+//            qDebug() << state();
+//            if (state() == QAbstractItemView::EditingState) {
+//                qDebug() << "A1" << nNextRow;
+
+//                // if we are editing, confirm and move to the row below
+//                QModelIndex oNextIndex = model()->index(nNextRow, currentIndex().column());
+//                setCurrentIndex(oNextIndex);
+//                selectionModel()->select(oNextIndex, QItemSelectionModel::ClearAndSelect);
+//            } else {
+//                qDebug() << "A12";
+//                // if we're not editing, start editing
+//                edit(currentIndex());
+//            }
+       // }
+        default:
+            QAbstractItemView::keyPressEvent(event);
         }
     }
 };

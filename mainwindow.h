@@ -31,6 +31,7 @@ public:
         l->setAlignment(cb, Qt::AlignCenter);
         l->setMargin(0);
         l->addWidget(cb);
+
         setLayout(l);
 
         connect(cb, &QCheckBox::stateChanged, [this, cb]() {
@@ -77,7 +78,6 @@ public:
     CustomHeader(QWidget* parent = 0)
         : QHeaderView(Qt::Horizontal, parent)
     {
-
         for (int i = 0; i < 6; i++) {
             headerSections.insert(i, new HeaderObject(this));
             headerSections[i]->hide();
@@ -86,16 +86,11 @@ public:
                 Q_EMIT sigStateChecked(i, checked);
             });
         }
-
-        //setFont(QFont("Helvetica [Cronyx]", 32));
-        //setMinimumSectionSize(headerSections[0]->minimumSizeHint().width());
-        //setDefaultSectionSize(headerSections[0]->minimumSizeHint().width());
     }
 
 protected:
     void paintSection(QPainter* painter, const QRect& rect, int logicalIndex) const
     {
-
         if (!rect.isValid())
             return;
 

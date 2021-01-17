@@ -69,7 +69,6 @@ void LineEditDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, 
 {
     QLineEdit* line = static_cast<QLineEdit*>(editor);
     QString value = line->text();
-    qDebug() << "edit" << value << index;
     if (value == "") {
         model->setData(index, -1);
     } else {

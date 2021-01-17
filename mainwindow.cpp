@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QShortcut>
+
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -16,15 +18,9 @@ MainWindow::MainWindow(QWidget* parent)
     ui->tableView_send->setHorizontalHeader(m_customHeader);
     ui->tableView_send->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-    // ui->tableView_send->setItemDelegateForRow(0, new HeaderDelegate(ui->tableView_send));
-
     ui->tableView_send->setModel(m_dataModel);
     ui->tableView_send->setItemDelegate(m_lineEditDelegate);
-    ui->tableView_send->setEditTriggers(QAbstractItemView::AllEditTriggers);
-
-    //ui->tableView_send->setHorizontalHeader(new CustomHeader(ui->tableView_send));
-    // MyHeader *myHeader = new MyHeader(Qt::Horizontal, ui->tableView_send);
-    // ui->tableView_send->setHorizontalHeader(myHeader);
+    //ui->tableView_send->setEditTriggers(QAbstractItemView::AllEditTriggers);
 
     m_columnsState.insert(0, false);
     m_columnsState.insert(1, false);
@@ -55,16 +51,78 @@ MainWindow::MainWindow(QWidget* parent)
         sendData();
     });
 
-    //    connect(m_dataModel, &DataModel::rowsInserted, [this]() {
-    //        QModelIndex index = ui->tableView_send->currentIndex();
-    //        ui->tableView_send->setCurrentIndex(m_dataModel->index(index.row() + 1,index.column()));
-    //    });
     connect(m_dataModel, &DataModel::dataChanged, [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles = QVector<int>()) {
         QModelIndex index = topLeft;
         if (m_dataModel->data(index, Qt::DisplayRole).isValid()) {
             ui->tableView_send->setCurrentIndex(m_dataModel->index(index.row() + 1, index.column()));
         } else {
             ui->tableView_send->setCurrentIndex(m_dataModel->index(index.row() - 1, index.column()));
+        }
+    });
+
+    QShortcut* shortcutCopy = new QShortcut(QKeySequence(QKeySequence::Copy), ui->tableView_send);
+    connect(shortcutCopy, &QShortcut::activated, [this]() {
+        QModelIndexList selectIndex = ui->tableView_send->selectionModel()->selectedIndexes();
+        if (selectIndex.count() == 0)
+            return;
+        QByteArray ba = m_dataModel->getData(selectIndex[0].column(), selectIndex[0].row(), selectIndex.count());
+
+        QStringList str;
+        for (int j = 0; j < ba.size(); j++) {
+
+            if (Setting::instance()->sendType() == Setting::InputType_Dec) {
+                str.append(QString::number((quint8)ba[j], 10).rightJustified(2, '0').toUpper());
+            }
+            if (Setting::instance()->sendType() == Setting::InputType_Hex) {
+                str.append(QString::number((quint8)ba[j], 16).rightJustified(2, '0').toUpper());
+            }
+            if (Setting::instance()->sendType() == Setting::InputType_ASCII) {
+                str.append(QString((char)ba[j]));
+            }
+        }
+
+        QClipboard* clipboard = QGuiApplication::clipboard();
+        clipboard->setText(str.join("\n"));
+    });
+
+    QShortcut* shortcutPaste = new QShortcut(QKeySequence(QKeySequence::Paste), ui->tableView_send);
+    connect(shortcutPaste, &QShortcut::activated, [this]() {
+        QModelIndexList selectIndex = ui->tableView_send->selectionModel()->selectedIndexes();
+        if (selectIndex.count() == 0)
+            return;
+        QClipboard* clipboard = QGuiApplication::clipboard();
+        QString originalText = clipboard->text();
+        if (clipboard->mimeData()->hasText()) {
+            QStringList list;
+            if (originalText.contains("\n")) {
+                list = originalText.split("\n");
+            }
+            if (originalText.contains(" ")) {
+                list = originalText.split(" ");
+            }
+            if (originalText.contains(",")) {
+                list = originalText.split(",");
+            }
+
+            QByteArray ba;
+            for (int j = 0; j < list.size(); j++) {
+
+                bool ok;
+                if (Setting::instance()->sendType() == Setting::InputType_Dec) {
+                    ba.append(list[j].toInt(&ok, 10));
+                }
+                if (Setting::instance()->sendType() == Setting::InputType_Hex) {
+                    qDebug() << list[j].toInt(&ok, 16) << list[j];
+                    ba.append(list[j].toInt(&ok, 16));
+                }
+                if (Setting::instance()->sendType() == Setting::InputType_ASCII) {
+                    ba.append(list[j]);
+                }
+            }
+
+            if (list.count() > 0) {
+                m_dataModel->insertData(selectIndex[0].column(), selectIndex[0].row(), ba);
+            }
         }
     });
 }
@@ -109,6 +167,7 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
         // standard event processing
         return QObject::eventFilter(watched, event);
     }
+    return QObject::eventFilter(watched, event);
 }
 
 void MainWindow::sendData()

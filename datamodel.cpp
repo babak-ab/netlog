@@ -41,7 +41,6 @@ bool DataModel::setData(const QModelIndex& index, const QVariant& value, int rol
 
     bool ok = false;
 
-    qDebug() << "p";
     if (Setting::instance()->inputType() == Setting::InputType_Hex) {
         m_data[index.column()][index.row()] = value.toString().toInt(&ok, 16);
         if (ok == false) {
@@ -56,7 +55,6 @@ bool DataModel::setData(const QModelIndex& index, const QVariant& value, int rol
         m_data[index.column()][index.row()] = (int)value.toString().toLatin1()[0];
     }
 
-    qDebug() << "e" << index;
     emit dataChanged(index, index, { Qt::DisplayRole, Qt::EditRole });
     return true;
 }
@@ -82,7 +80,8 @@ QVariant DataModel::data(const QModelIndex& index, int role) const
     } else {
         if (Setting::instance()->inputType() == Setting::InputType_Hex) {
             int value = m_data.at(index.column()).at(index.row());
-            return "0x" + QString::number(value, 16).toUpper();
+            qDebug() << "value" << value;
+            return "0x" + QString::number(value, 16).rightJustified(2, '0').toUpper();
         } else if (Setting::instance()->inputType() == Setting::InputType_Dec) {
             return m_data.at(index.column()).at(index.row());
         } else {
@@ -98,10 +97,21 @@ Qt::ItemFlags DataModel::flags(const QModelIndex& index) const
     if (!index.isValid())
         return Qt::NoItemFlags;
 
-    if (index.row() >= 1 && m_data[index.column()][index.row() - 1] == -1)
-        return Qt::NoItemFlags;
+    if (index.row() < m_data[index.column()].count()) {
+        if (index.row() >= 1 && m_data[index.column()][index.row() - 1] == -1)
+            return Qt::NoItemFlags;
+    }
 
     return Qt::ItemIsEditable | QAbstractItemModel::flags(index);
+}
+
+void DataModel::insertData(int column, int row, QByteArray ba)
+{
+    beginInsertRows(QModelIndex(), row, ba.count() + row);
+    for (int j = 0; j < ba.count(); j++) {
+        m_data[column].insert(row + j, (quint8)ba[j]);
+    }
+    endInsertRows();
 }
 
 QByteArray DataModel::getData(int column)
@@ -114,6 +124,16 @@ QByteArray DataModel::getData(int column)
 
         //qDebug() << m_data[column].at(i) << QString(m_data[column].at(i)).toLatin1() << QString::number(m_data[column].at(i), 16);
         buffer.append(m_data[column].at(i));
+    }
+    return buffer;
+}
+
+QByteArray DataModel::getData(int column, int startRow, int count)
+{
+    QByteArray buffer;
+    for (int i = 0; i < count; ++i) {
+
+        buffer.append(m_data[column].at(i + startRow));
     }
     return buffer;
 }

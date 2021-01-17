@@ -18,7 +18,9 @@ public:
     QVariant data(const QModelIndex& index, int role) const;
     Qt::ItemFlags flags(const QModelIndex& index) const;
 
+    void insertData(int column, int row, QByteArray ba);
     QByteArray getData(int column);
+    QByteArray getData(int column, int startRow, int count);
 private Q_SLOTS:
     void sltDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles = QVector<int>());
 

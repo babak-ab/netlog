@@ -1,5 +1,8 @@
 #include "lineeditdelegate.h"
 
+#include <QEvent>
+#include <qevent.h>
+
 LineEditDelegate::LineEditDelegate(QObject* parent)
     : QStyledItemDelegate(parent)
 {
@@ -52,3 +55,5 @@ void LineEditDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionV
 {
     editor->setGeometry(option.rect);
 }
+
+

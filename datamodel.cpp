@@ -29,6 +29,10 @@ bool DataModel::setData(const QModelIndex& index, const QVariant& value, int rol
     if (role != Qt::EditRole)
         return false;
 
+    if (value == -1 && m_data[index.column()][index.row() + 1] != -1) {
+        return false;
+    }
+
     bool ok = false;
 
     if (Setting::instance()->inputType() == Setting::InputType_Hex) {
@@ -108,7 +112,15 @@ QByteArray DataModel::getData(int column)
 
 void DataModel::sltDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
 {
-    if (topLeft.row() + 1 == m_data[0].count()) {
+    bool insert = false;
+    bool remove = true;
+    for (int j = 0; j < m_columns; j++) {
+        if (m_data[j][topLeft.row()] != -1) {
+            insert = true;
+            remove = false;
+        }
+    }
+    if (insert && (topLeft.row() + 1 == m_data[0].count())) {
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
         for (int j = 0; j < m_columns; j++) {
             QVector<int> temp(1);
@@ -116,6 +128,13 @@ void DataModel::sltDataChanged(const QModelIndex& topLeft, const QModelIndex& bo
             m_data[j].append(temp);
         }
         endInsertRows();
+    }
+    if (remove && (topLeft.row() + 2 == m_data[0].count())) {
+        beginRemoveRows(QModelIndex(), rowCount() - 1, rowCount() - 1);
+        for (int j = 0; j < m_columns; j++) {
+            m_data[j].remove(topLeft.row() + 1);
+        }
+        endRemoveRows();
     }
 }
 

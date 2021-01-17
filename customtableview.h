@@ -49,6 +49,16 @@ protected:
 
         menu.exec(event->globalPos());
     }
+
+    // QWidget interface
+protected:
+    void keyPressEvent(QKeyEvent* event)
+    {
+
+        if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace) {
+            model()->setData(currentIndex(), -1);
+        }
+    }
 };
 
 #endif // CUSTOMTABLEVIEW_H

@@ -52,7 +52,11 @@ bool DataModel::setData(const QModelIndex& index, const QVariant& value, int rol
             return false;
         }
     } else {
-        m_data[index.column()][index.row()] = (int)value.toString().toLatin1()[0];
+        if (value == -1) {
+            m_data[index.column()][index.row()] = -1;
+        } else {
+            m_data[index.column()][index.row()] = (int)value.toString().toLatin1()[0];
+        }
     }
 
     emit dataChanged(index, index, { Qt::DisplayRole, Qt::EditRole });

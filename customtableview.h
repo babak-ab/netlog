@@ -79,6 +79,36 @@ protected:
             qDebug() << mimeData->text();
         }
     }
+
+private:
+    int m_selectedColumn = -1;
+    QModelIndexList items;
+    // QAbstractItemView interface
+protected slots:
+    void selectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+    {
+        QModelIndex index;
+        if (items.empty())
+            items = selected.indexes();
+        else {
+            QModelIndexList nitems = selected.indexes();
+            foreach (index, nitems) {
+                if (index.column() == items[0].column()) {
+                    items.append(index);
+                }
+            }
+        }
+
+        QModelIndexList sub = selectionModel()->selectedIndexes().toSet().subtract(items.toSet()).toList();
+        foreach (index, sub) {
+            selectionModel()->select(index, QItemSelectionModel::Deselect);
+        }
+
+        if (selectionModel()->selectedIndexes().count() == 0) {
+            items.clear();
+        }
+        QAbstractItemView::selectionChanged(selected, deselected);
+    }
 };
 
 #endif // CUSTOMTABLEVIEW_H

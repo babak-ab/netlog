@@ -80,7 +80,6 @@ QVariant DataModel::data(const QModelIndex& index, int role) const
     } else {
         if (Setting::instance()->inputType() == Setting::InputType_Hex) {
             int value = m_data.at(index.column()).at(index.row());
-            qDebug() << "value" << value;
             return "0x" + QString::number(value, 16).rightJustified(2, '0').toUpper();
         } else if (Setting::instance()->inputType() == Setting::InputType_Dec) {
             return m_data.at(index.column()).at(index.row());
@@ -107,11 +106,29 @@ Qt::ItemFlags DataModel::flags(const QModelIndex& index) const
 
 void DataModel::insertData(int column, int row, QByteArray ba)
 {
-    beginInsertRows(QModelIndex(), row, ba.count() + row);
-    for (int j = 0; j < ba.count(); j++) {
-        m_data[column].insert(row + j, (quint8)ba[j]);
+
+    bool flag = false;
+    if (rowCount() < row + ba.count() - 1) {
+        flag = true;
+        Q_EMIT beginInsertRows(QModelIndex(), row, row + ba.count() - 1);
+        for (int j = 0; j < ba.count(); j++) {
+            for (int j = 0; j < m_columns; j++) {
+                QVector<int> temp(1);
+                temp.fill(-1);
+                m_data[j].append(temp);
+            }
+        }
     }
-    endInsertRows();
+
+    for (int j = 0; j < ba.count(); j++) {
+        m_data[column][row + j] = (quint8)ba[j];
+    }
+
+    if (flag)
+        Q_EMIT endInsertRows();
+    else {
+        Q_EMIT dataChanged(index(row, column), index(row + ba.count() - 1, column));
+    }
 }
 
 QByteArray DataModel::getData(int column)
@@ -143,7 +160,7 @@ void DataModel::sltDataChanged(const QModelIndex& topLeft, const QModelIndex& bo
     bool insert = false;
     bool remove = true;
     for (int j = 0; j < m_columns; j++) {
-        if (m_data[j][topLeft.row()] != -1) {
+        if (topLeft.row() < m_data[j].count() && m_data[j][topLeft.row()] != -1) {
             insert = true;
             remove = false;
         }

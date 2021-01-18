@@ -70,17 +70,16 @@ MainWindow::MainWindow(QWidget* parent)
         QStringList str;
         for (int j = 0; j < ba.size(); j++) {
 
-            if (Setting::instance()->sendType() == Setting::InputType_Dec) {
+            if (Setting::instance()->inputType() == Setting::InputType_Dec) {
                 str.append(QString::number((quint8)ba[j], 10).rightJustified(2, '0').toUpper());
             }
-            if (Setting::instance()->sendType() == Setting::InputType_Hex) {
+            if (Setting::instance()->inputType() == Setting::InputType_Hex) {
                 str.append(QString::number((quint8)ba[j], 16).rightJustified(2, '0').toUpper());
             }
-            if (Setting::instance()->sendType() == Setting::InputType_ASCII) {
-                str.append(QString((char)ba[j]));
+            if (Setting::instance()->inputType() == Setting::InputType_ASCII) {
+                str.append(QString(QChar((char)ba[j])));
             }
         }
-
         QClipboard* clipboard = QGuiApplication::clipboard();
         clipboard->setText(str.join("\n"));
     });
@@ -108,14 +107,13 @@ MainWindow::MainWindow(QWidget* parent)
             for (int j = 0; j < list.size(); j++) {
 
                 bool ok;
-                if (Setting::instance()->sendType() == Setting::InputType_Dec) {
+                if (Setting::instance()->inputType() == Setting::InputType_Dec) {
                     ba.append(list[j].toInt(&ok, 10));
                 }
-                if (Setting::instance()->sendType() == Setting::InputType_Hex) {
-                    qDebug() << list[j].toInt(&ok, 16) << list[j];
+                if (Setting::instance()->inputType() == Setting::InputType_Hex) {
                     ba.append(list[j].toInt(&ok, 16));
                 }
-                if (Setting::instance()->sendType() == Setting::InputType_ASCII) {
+                if (Setting::instance()->inputType() == Setting::InputType_ASCII) {
                     ba.append(list[j]);
                 }
             }

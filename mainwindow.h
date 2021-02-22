@@ -13,9 +13,12 @@
 #include <QPainter>
 #include <QPlainTextEdit>
 #include <QPointer>
+#include <QSerialPort>
+#include <QSerialPortInfo>
 #include <QTableView>
 #include <QTimer>
 #include <lineeditdelegate.h>
+
 class HeaderObject : public QWidget {
     Q_OBJECT
 public:
@@ -145,6 +148,12 @@ private:
     QMap<int, bool> m_columnsState;
     bool m_colorChange = false;
     bool m_ctrlKeyPressed = false;
+
+    QSerialPort m_serialPort;
+    QIntValidator* m_intValidator = nullptr;
+
+    void fillSerialParameters();
+    void fillSerialPorts();
 private Q_SLOTS:
 
     void on_pushButton_send_clicked();
@@ -154,6 +163,12 @@ private Q_SLOTS:
     void on_spinBox_interval_valueChanged(int arg1);
 
     void on_pushButton_sendClear_clicked();
+
+    void on_pushButton_serialPortOpen_clicked();
+
+    void checkCustomBaudRatePolicy(int idx);
+
+    void checkCustomDevicePathPolicy(int idx);
 
 protected:
     void resizeEvent(QResizeEvent* event);

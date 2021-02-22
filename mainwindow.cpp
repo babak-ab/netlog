@@ -123,11 +123,68 @@ MainWindow::MainWindow(QWidget* parent)
             }
         }
     });
+
+    fillSerialParameters();
+    fillSerialPorts();
+
+    m_intValidator = new QIntValidator(0, 4000000, this);
+    ui->baudRateBox->setInsertPolicy(QComboBox::NoInsert);
+
+    connect(ui->baudRateBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this, &MainWindow::checkCustomBaudRatePolicy);
+
+    connect(ui->serialPortInfoListBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &MainWindow::checkCustomDevicePathPolicy);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::fillSerialParameters()
+{
+    ui->baudRateBox->addItem(QStringLiteral("9600"), QSerialPort::Baud9600);
+    ui->baudRateBox->addItem(QStringLiteral("19200"), QSerialPort::Baud19200);
+    ui->baudRateBox->addItem(QStringLiteral("38400"), QSerialPort::Baud38400);
+    ui->baudRateBox->addItem(QStringLiteral("115200"), QSerialPort::Baud115200);
+    ui->baudRateBox->addItem(tr("Custom"));
+
+    ui->dataBitsBox->addItem(QStringLiteral("5"), QSerialPort::Data5);
+    ui->dataBitsBox->addItem(QStringLiteral("6"), QSerialPort::Data6);
+    ui->dataBitsBox->addItem(QStringLiteral("7"), QSerialPort::Data7);
+    ui->dataBitsBox->addItem(QStringLiteral("8"), QSerialPort::Data8);
+    ui->dataBitsBox->setCurrentIndex(3);
+
+    ui->parityBox->addItem(tr("None"), QSerialPort::NoParity);
+    ui->parityBox->addItem(tr("Even"), QSerialPort::EvenParity);
+    ui->parityBox->addItem(tr("Odd"), QSerialPort::OddParity);
+    ui->parityBox->addItem(tr("Mark"), QSerialPort::MarkParity);
+    ui->parityBox->addItem(tr("Space"), QSerialPort::SpaceParity);
+
+    ui->stopBitsBox->addItem(QStringLiteral("1"), QSerialPort::OneStop);
+#ifdef Q_OS_WIN
+    ui->stopBitsBox->addItem(tr("1.5"), QSerialPort::OneAndHalfStop);
+#endif
+    ui->stopBitsBox->addItem(QStringLiteral("2"), QSerialPort::TwoStop);
+
+    ui->flowControlBox->addItem(tr("None"), QSerialPort::NoFlowControl);
+    ui->flowControlBox->addItem(tr("RTS/CTS"), QSerialPort::HardwareControl);
+    ui->flowControlBox->addItem(tr("XON/XOFF"), QSerialPort::SoftwareControl);
+}
+
+void MainWindow::fillSerialPorts()
+{
+    ui->serialPortInfoListBox->clear();
+    QString description;
+    QString manufacturer;
+    QString serialNumber;
+    const auto infos = QSerialPortInfo::availablePorts();
+    for (const QSerialPortInfo& info : infos) {
+        ui->serialPortInfoListBox->addItem(info.portName());
+    }
+
+    ui->serialPortInfoListBox->addItem(tr("Custom"));
 }
 
 void MainWindow::resizeEvent(QResizeEvent* event)
@@ -226,4 +283,38 @@ void MainWindow::on_spinBox_interval_valueChanged(int arg1)
 void MainWindow::on_pushButton_sendClear_clicked()
 {
     ui->plainTextEdit_send->clear();
+}
+
+void MainWindow::on_pushButton_serialPortOpen_clicked()
+{
+    if (m_serialPort.isOpen()) {
+        m_serialPort.close();
+        ui->parametersBox->setEnabled(true);
+    } else {
+        bool open = m_serialPort.open(QSerialPort::ReadWrite);
+        if (open)
+            ui->parametersBox->setEnabled(false);
+        else {
+            ui->plainTextEdit_serialError->appendPlainText("Error: Can not Open Serial Port (" + m_serialPort.errorString() + ")");
+        }
+    }
+}
+
+void MainWindow::checkCustomBaudRatePolicy(int idx)
+{
+    const bool isCustomBaudRate = !ui->baudRateBox->itemData(idx).isValid();
+    ui->baudRateBox->setEditable(isCustomBaudRate);
+    if (isCustomBaudRate) {
+        ui->baudRateBox->clearEditText();
+        QLineEdit *edit = ui->baudRateBox->lineEdit();
+        edit->setValidator(m_intValidator);
+    }
+}
+
+void MainWindow::checkCustomDevicePathPolicy(int idx)
+{
+    const bool isCustomPath = !ui->serialPortInfoListBox->itemData(idx).isValid();
+    ui->serialPortInfoListBox->setEditable(isCustomPath);
+    if (isCustomPath)
+        ui->serialPortInfoListBox->clearEditText();
 }
